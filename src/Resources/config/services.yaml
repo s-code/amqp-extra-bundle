@@ -1,0 +1,7 @@
+services:
+    SCode\AmqpRpcTransportBundle\Transport\RpcAmqpTransportFactory:
+        arguments: ['@SCode\AmqpRpcTransportBundle\Transport\RpcAmqpTransportFactory.inner']
+        decorates: '@messenger.transport.amqp.factory'
+
+    rpc_amqp_middleware:
+        class: SCode\AmqpRpcTransportBundle\Middleware\RpcAmqpMiddleware

@@ -2,7 +2,7 @@
 
 namespace SCode\AmqpRpcTransportBundle\Transport;
 
-use Symfony\Component\Messenger\Transport\AmqpExt\AmqpStamp;
+use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Transport\AmqpExt\Connection;
 
 class RpcConnection
@@ -29,7 +29,7 @@ class RpcConnection
         $this->original = $original;
     }
 
-    public function reply(string $body, string $replyTo, array $attributes = []): void
+    public function reply(string $replyTo, string $body, array $headers = []): void
     {
         $this->clearWhenDisconnected();
         
@@ -37,10 +37,17 @@ class RpcConnection
             $this->replyExchange = new \AMQPExchange($this->original->channel());
         }
 
+        $attributes = ['headers' => $headers];
+
+        if (isset($headers['Content-Type'])) {
+            $attributes['content_type'] = $headers['Content-Type'];
+            unset($attributes['headers']['Content-Type']);
+        }
+
         $this->replyExchange->publish($body, $replyTo, AMQP_NOPARAM, $attributes);
     }
     
-    public function get(): ?\AMQPEnvelope
+    public function get(): \AMQPEnvelope
     {
         $response = null;
 
@@ -49,6 +56,10 @@ class RpcConnection
 
             return false;
         }, AMQP_JUST_CONSUME);
+
+        if ($response === null) {
+            throw new TransportException('Unable to get rpc response');
+        }
 
         return $response;
     }

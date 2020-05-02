@@ -2,29 +2,29 @@
 
 namespace SCode\AmqpRpcTransportBundle\Middleware;
 
-use SCode\AmqpRpcTransportBundle\Transport\AmqpReplySenderStamp;
+use SCode\AmqpRpcTransportBundle\Stamp\ReplySenderStamp;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\StackInterface;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
 
-class RpcAmqpMiddleware  implements MiddlewareInterface
+class RpcMiddleware  implements MiddlewareInterface
 {
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
         $finalEnvelop = $stack->next()->handle($envelope, $stack);
 
-        /** @var AmqpReplySenderStamp|null $replyStamp */
-        $replyStamp = $finalEnvelop->last(AmqpReplySenderStamp::class);
-        /** @var HandledStamp $handledStamp */
+        /** @var ReplySenderStamp|null $replyStamp */
+        $replyStamp = $finalEnvelop->last(ReplySenderStamp::class);
+        /** @var HandledStamp|null $handledStamp */
         $handledStamp = $finalEnvelop->last(HandledStamp::class);
 
         if (null === $replyStamp || null === $handledStamp) {
             return $finalEnvelop;
         }
 
-        $replyStamp->getSender()($handledStamp->getResult());
+        $replyStamp->getSender()($finalEnvelop);
 
-        return $finalEnvelop->withoutAll(AmqpReplySenderStamp::class);
+        return $finalEnvelop->withoutAll(ReplySenderStamp::class);
     }
 }

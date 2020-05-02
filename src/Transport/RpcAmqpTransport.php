@@ -2,12 +2,12 @@
 
 namespace SCode\AmqpRpcTransportBundle\Transport;
 
+use SCode\AmqpRpcTransportBundle\Serialization\RpcSerializer;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Transport\AmqpExt\AmqpReceiver;
 use Symfony\Component\Messenger\Transport\AmqpExt\AmqpSender;
 use Symfony\Component\Messenger\Transport\AmqpExt\Connection;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
-use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\SetupableTransportInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
@@ -15,7 +15,7 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
 class RpcAmqpTransport implements TransportInterface, SetupableTransportInterface, MessageCountAwareInterface
 {
     /**
-     * @var SerializerInterface 
+     * @var RpcSerializer
      */
     private $serializer;
 
@@ -34,10 +34,10 @@ class RpcAmqpTransport implements TransportInterface, SetupableTransportInterfac
      */
     private $sender;
 
-    public function __construct(Connection $connection, SerializerInterface $serializer = null)
+    public function __construct(Connection $connection, SerializerInterface $serializer)
     {
         $this->connection = new RpcConnection($connection);
-        $this->serializer = $serializer ?? new PhpSerializer();
+        $this->serializer = new RpcSerializer($serializer);
     }
 
     public function get(): iterable
@@ -74,7 +74,8 @@ class RpcAmqpTransport implements TransportInterface, SetupableTransportInterfac
     {
         $this->receiver = new RpcAmqpReceiver(
             $this->connection,
-            new AmqpReceiver($this->connection->getWrapped(), $this->serializer)
+            $this->serializer,
+            new AmqpReceiver($this->connection->getWrapped(), $this->serializer->getWrapped())
         );
 
         return $this->receiver;
@@ -84,7 +85,8 @@ class RpcAmqpTransport implements TransportInterface, SetupableTransportInterfac
     {
         $this->sender = new RpcAmqpSender(
             $this->connection,
-            new AmqpSender($this->connection->getWrapped(), $this->serializer)
+            $this->serializer,
+            new AmqpSender($this->connection->getWrapped(), $this->serializer->getWrapped())
         );
 
         return $this->sender;

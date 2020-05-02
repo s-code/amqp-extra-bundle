@@ -1,6 +1,6 @@
 <?php
 
-namespace SCode\AmqpRpcTransportBundle\Transport;
+namespace SCode\AmqpRpcTransportBundle\Stamp;
 
 use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 

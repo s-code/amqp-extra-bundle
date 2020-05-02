@@ -2,6 +2,8 @@
 
 namespace SCode\AmqpRpcTransportBundle\Transport;
 
+use SCode\AmqpRpcTransportBundle\Serialization\RpcSerializer;
+use SCode\AmqpRpcTransportBundle\Stamp\ReplySenderStamp;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Transport\AmqpExt\AmqpReceivedStamp;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
@@ -20,24 +22,36 @@ class RpcAmqpReceiver implements ReceiverInterface, MessageCountAwareInterface
     private $original;
 
     /**
+     * @var RpcSerializer
+     */
+    private $rpcSerializer;
+
+    /**
      * @param RpcConnection $connection
+     * @param RpcSerializer $rpcSerializer
      * @param ReceiverInterface&MessageCountAwareInterface $original
      */
-    public function __construct(RpcConnection $connection, $original)
+    public function __construct(RpcConnection $connection, RpcSerializer $rpcSerializer, $original)
     {
         $this->connection = $connection;
+        $this->rpcSerializer = $rpcSerializer;
         $this->original = $original;
     }
 
     public function get(): iterable
     {
         foreach ($this->original->get() as $envelope) {
-            /** @var \AMQPEnvelope $amqpEnvelop */
-            $amqpEnvelop = $envelope->last(AmqpReceivedStamp::class)->getAmqpEnvelope();
+            /** @var AmqpReceivedStamp|null $receivedStamp */
+            $receivedStamp = $envelope->last(AmqpReceivedStamp::class);
+            $replyTo = $receivedStamp ? $receivedStamp->getAmqpEnvelope()->getReplyTo() : null;
 
-            $replySender = $this->buildReplySender($amqpEnvelop);
+            if ($replyTo === null) {
+                throw new \RuntimeException('Unable to determine reply queue name from received message');
+            }
 
-            yield $envelope->with(new AmqpReplySenderStamp($replySender));
+            $replySender = $this->buildReplySender($replyTo);
+
+            yield $envelope->with(new ReplySenderStamp($replySender));
         }
     }
 
@@ -56,12 +70,12 @@ class RpcAmqpReceiver implements ReceiverInterface, MessageCountAwareInterface
         return $this->original->getMessageCount();
     }
 
-    protected function buildReplySender(\AMQPEnvelope $amqpEnvelop): callable
+    protected function buildReplySender(string $replyTo): callable
     {
-        return function ($result) use ($amqpEnvelop) {
-            $data = $this->rpcSerializer->serialize($amqpEnvelop, $result);
+        return function (Envelope $envelope) use ($replyTo) {
+            $data = $this->rpcSerializer->encode($envelope);
 
-            $this->connection->reply($data['body'], $replyTo, $data['attributes']);
+            $this->connection->reply($replyTo, $data['body'], $data['headers']);
         };
     }
 }

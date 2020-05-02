@@ -29,7 +29,7 @@ class RpcConnection
         $this->original = $original;
     }
 
-    public function reply(string $response, string $replyTo): void
+    public function reply(string $body, string $replyTo, array $attributes = []): void
     {
         $this->clearWhenDisconnected();
         
@@ -37,14 +37,14 @@ class RpcConnection
             $this->replyExchange = new \AMQPExchange($this->original->channel());
         }
 
-        $this->replyExchange->publish($response, $replyTo, AMQP_NOPARAM);
+        $this->replyExchange->publish($body, $replyTo, AMQP_NOPARAM, $attributes);
     }
     
     public function get(): ?\AMQPEnvelope
     {
         $response = null;
 
-        $this->initReplyQueue()->consume(function (\AMQPEnvelope $envelope) use (&$response) {
+        $this->getReplyQueue()->consume(function (\AMQPEnvelope $envelope) use (&$response) {
             $response = $envelope;
 
             return false;
@@ -52,25 +52,13 @@ class RpcConnection
 
         return $response;
     }
-
-    public function publish(string $body, array $headers = [], int $delayInMs = 0, AmqpStamp $amqpStamp = null): void
-    {
-        $this->initReplyQueue();
-        
-        $this->original->publish(
-            $body,
-            $headers,
-            $delayInMs,
-            AmqpStamp::createWithAttributes(['reply_to' => self::DIRECT_REPLY_QUEUE], $amqpStamp)
-        );
-    }
     
     public function getWrapped(): Connection
     {
         return $this->original;
     }
 
-    private function initReplyQueue(): \AMQPQueue
+    public function initReplyQueue(): string
     {
         $this->clearWhenDisconnected();
 
@@ -78,6 +66,15 @@ class RpcConnection
             $this->replyQueue = new \AMQPQueue($this->original->channel());
             $this->replyQueue->setName(self::DIRECT_REPLY_QUEUE);
             $this->replyQueue->consume(null, AMQP_AUTOACK);
+        }
+
+        return self::DIRECT_REPLY_QUEUE;
+    }
+
+    private function getReplyQueue(): \AMQPQueue
+    {
+        if ($this->replyQueue === null) {
+            throw new \LogicException('Reply queue should be initialized first');
         }
 
         return $this->replyQueue;

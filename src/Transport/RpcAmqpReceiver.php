@@ -32,13 +32,10 @@ class RpcAmqpReceiver implements ReceiverInterface, MessageCountAwareInterface
     public function get(): iterable
     {
         foreach ($this->original->get() as $envelope) {
-            /** @var AmqpReceivedStamp $receivedStamp */
-            $receivedStamp = $envelope->last(AmqpReceivedStamp::class);
-            $replyTo = $receivedStamp->getAmqpEnvelope()->getReplyTo();
+            /** @var \AMQPEnvelope $amqpEnvelop */
+            $amqpEnvelop = $envelope->last(AmqpReceivedStamp::class)->getAmqpEnvelope();
 
-            $replySender = function (string $response) use ($replyTo) {
-                $this->connection->reply($response, $replyTo);
-            };
+            $replySender = $this->buildReplySender($amqpEnvelop);
 
             yield $envelope->with(new AmqpReplySenderStamp($replySender));
         }
@@ -57,5 +54,14 @@ class RpcAmqpReceiver implements ReceiverInterface, MessageCountAwareInterface
     public function getMessageCount(): int
     {
         return $this->original->getMessageCount();
+    }
+
+    protected function buildReplySender(\AMQPEnvelope $amqpEnvelop): callable
+    {
+        return function ($result) use ($amqpEnvelop) {
+            $data = $this->rpcSerializer->serialize($amqpEnvelop, $result);
+
+            $this->connection->reply($data['body'], $replyTo, $data['attributes']);
+        };
     }
 }

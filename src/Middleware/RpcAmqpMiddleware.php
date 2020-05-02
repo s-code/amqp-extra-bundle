@@ -12,17 +12,19 @@ class RpcAmqpMiddleware  implements MiddlewareInterface
 {
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
-        /** @var AmqpReplySenderStamp $replyStamp */
-        $replyStamp = $envelope->last(AmqpReplySenderStamp::class);
+        $finalEnvelop = $stack->next()->handle($envelope, $stack);
 
+        /** @var AmqpReplySenderStamp|null $replyStamp */
+        $replyStamp = $finalEnvelop->last(AmqpReplySenderStamp::class);
         /** @var HandledStamp $handledStamp */
-        $handledStamp = $envelope->last(HandledStamp::class);
+        $handledStamp = $finalEnvelop->last(HandledStamp::class);
 
-        if (null !== $replyStamp && null !== $handledStamp) {
-            $replyStamp->getSender()($handledStamp->getResult() ?? '');
-            $envelope = $envelope->withoutAll(AmqpReplySenderStamp::class);
+        if (null === $replyStamp || null === $handledStamp) {
+            return $finalEnvelop;
         }
 
-        return $stack->next()->handle($envelope, $stack);
+        $replyStamp->getSender()($handledStamp->getResult());
+
+        return $finalEnvelop->withoutAll(AmqpReplySenderStamp::class);
     }
 }

@@ -4,7 +4,7 @@ namespace SCode\AmqpRpcTransportBundle\Transport;
 
 use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 
-class AmqpReplySenderStamp implements NonSendableStampInterface
+class ReplySenderStamp implements NonSendableStampInterface
 {
     /**
      * @var callable

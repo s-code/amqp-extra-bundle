@@ -58,7 +58,7 @@ class RpcSerializer implements SerializerInterface
             return $result;
         }
 
-        return new ScalarRpcResult($result);
+        return new \ArrayObject(['result' => $result]);
     }
 
     private function buildReplyStamps(array $originalStamps): array

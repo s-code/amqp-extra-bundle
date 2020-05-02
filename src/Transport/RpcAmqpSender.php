@@ -51,7 +51,7 @@ class RpcAmqpSender implements SenderInterface
 
     protected function buildReplyReceiver(): callable
     {
-        return static function () {
+        return function () {
             $envelop = $this->connection->get();
             $body = $envelop->getBody();
 

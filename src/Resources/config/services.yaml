@@ -1,7 +1,13 @@
 services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
     SCode\AmqpRpcTransportBundle\Transport\RpcAmqpTransportFactory:
         arguments: ['@SCode\AmqpRpcTransportBundle\Transport\RpcAmqpTransportFactory.inner']
         decorates: 'messenger.transport.amqp.factory'
 
     rpc_middleware:
         class: SCode\AmqpRpcTransportBundle\Middleware\RpcMiddleware
+
+    SCode\AmqpRpcTransportBundle\Serialization\ArrayObjectDenormalizer: ~

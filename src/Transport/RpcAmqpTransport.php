@@ -1,8 +1,8 @@
 <?php
 
-namespace SCode\AmqpRpcTransportBundle\Transport;
+namespace SCode\AmqpExtraBundle\Transport;
 
-use SCode\AmqpRpcTransportBundle\Serialization\RpcSerializer;
+use SCode\AmqpExtraBundle\Serialization\RpcSerializer;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Transport\AmqpExt\AmqpReceiver;
 use Symfony\Component\Messenger\Transport\AmqpExt\AmqpSender;

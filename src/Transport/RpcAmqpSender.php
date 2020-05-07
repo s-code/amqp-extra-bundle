@@ -1,9 +1,9 @@
 <?php
 
-namespace SCode\AmqpRpcTransportBundle\Transport;
+namespace SCode\AmqpExtraBundle\Transport;
 
-use SCode\AmqpRpcTransportBundle\Serialization\RpcSerializer;
-use SCode\AmqpRpcTransportBundle\Stamp\ReplyReceiverStamp;
+use SCode\AmqpExtraBundle\Serialization\RpcSerializer;
+use SCode\AmqpExtraBundle\Stamp\ReplyReceiverStamp;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Transport\AmqpExt\AmqpStamp;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;

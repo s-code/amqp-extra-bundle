@@ -1,8 +1,8 @@
 <?php
 
-namespace SCode\AmqpRpcTransportBundle\Middleware;
+namespace SCode\AmqpExtraBundle\Middleware;
 
-use SCode\AmqpRpcTransportBundle\Stamp\ReplySenderStamp;
+use SCode\AmqpExtraBundle\Stamp\ReplySenderStamp;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\StackInterface;

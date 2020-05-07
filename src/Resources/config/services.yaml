@@ -3,11 +3,23 @@ services:
         autowire: true
         autoconfigure: true
 
-    SCode\AmqpRpcTransportBundle\Transport\RpcAmqpTransportFactory:
-        arguments: ['@SCode\AmqpRpcTransportBundle\Transport\RpcAmqpTransportFactory.inner']
+    SCode\AmqpExtraBundle\Serialization\ArrayObjectDenormalizer: ~
+
+    amqp_extra.rpc_transport_factory:
+        class: SCode\AmqpExtraBundle\Transport\RpcAmqpTransportFactory
+        arguments: ['@amqp_extra.rpc_transport_factory.inner']
         decorates: 'messenger.transport.amqp.factory'
 
-    rpc_middleware:
-        class: SCode\AmqpRpcTransportBundle\Middleware\RpcMiddleware
+    amqp_extra.rpc_middleware:
+        class: SCode\AmqpExtraBundle\Middleware\RpcMiddleware
 
-    SCode\AmqpRpcTransportBundle\Serialization\ArrayObjectDenormalizer: ~
+    amqp_extra.dynamic_routing_middleware:
+        class: SCode\AmqpExtraBundle\Middleware\DynamicRoutingMiddleware
+
+    amqp_extra.routing_map_name_converter:
+        class: Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter
+        arguments: [~, false]
+
+    amqp_extra.routing_map:
+        class: SCode\AmqpExtraBundle\Middleware\RoutingMap
+        arguments: ['@messenger_extra.routing_map_name_converter']

@@ -1,6 +1,6 @@
 <?php
 
-namespace SCode\AmqpRpcTransportBundle\Transport;
+namespace SCode\AmqpExtraBundle\Transport;
 
 use Symfony\Component\Messenger\Transport\AmqpExt\AmqpTransportFactory;
 use Symfony\Component\Messenger\Transport\AmqpExt\Connection;

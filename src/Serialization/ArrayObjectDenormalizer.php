@@ -1,6 +1,6 @@
 <?php
 
-namespace SCode\AmqpRpcTransportBundle\Serialization;
+namespace SCode\AmqpExtraBundle\Serialization;
 
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 

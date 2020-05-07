@@ -1,22 +1,23 @@
 {
-    "name": "s-code/amqp-rpc-transport-bundle",
-    "description": "Rpc transport for messenger",
+    "name": "s-code/amqp-extra-bundle",
+    "description": "Extra features for messenger amqp transport",
     "type": "symfony-bundle",
     "license": "proprietary",
     "autoload": {
         "psr-4": {
-            "SCode\\AmqpRpcTransportBundle\\": "src"
+            "SCode\\AmqpExtraBundle\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "SCode\\AmqpRpcTransportBundle\\Tests\\": "tests"
+            "SCode\\AmqpExtraBundle\\Tests\\": "tests"
         }
     },
     "require": {
         "php": "^7.1",
         "symfony/framework-bundle": "^4.1|^5.0",
-        "symfony/messenger": "^4.1|^5.0"
+        "symfony/messenger": "^4.1|^5.0",
+        "symfony/serializer": "^4.1|^5.0"
     },
     "require-dev": {
     }

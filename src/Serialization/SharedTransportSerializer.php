@@ -2,7 +2,6 @@
 
 namespace SCode\AmqpExtraBundle\Serialization;
 
-use SCode\AmqpExtraBundle\Middleware\RoutingMap;
 use SCode\AmqpExtraBundle\Middleware\RoutingStrategyInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\BusNameStamp;

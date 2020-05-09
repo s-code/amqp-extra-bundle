@@ -2,11 +2,9 @@
 
 namespace SCode\AmqpExtraBundle\Serialization;
 
-use SCode\AmqpExtraBundle\Middleware\RoutingStrategyInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\BusNameStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
-use Symfony\Component\Messenger\Transport\AmqpExt\AmqpStamp;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
@@ -37,10 +35,10 @@ class SharedTransportSerializer implements SerializerInterface
         Serializer $originalSerializer,
         HeadersConverterInterface $headersConverter
     ) {
-        $this->busNameHeader = HeadersConverterInterface::STAMP_HEADER_PREFIX . BusNameStamp::class;
-        $this->originalSerializer = $originalSerializer;
         $this->busName = $busName;
+        $this->originalSerializer = $originalSerializer;
         $this->headersConverter = $headersConverter;
+        $this->busNameHeader = HeadersConverterInterface::STAMP_HEADER_PREFIX . BusNameStamp::class;
     }
 
     public function decode(array $encodedEnvelope): Envelope

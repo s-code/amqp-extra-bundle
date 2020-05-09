@@ -1,6 +1,6 @@
 <?php
 
-namespace SCode\AmqpExtraBundle\Middleware;
+namespace SCode\AmqpExtraBundle\Routing;
 
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 

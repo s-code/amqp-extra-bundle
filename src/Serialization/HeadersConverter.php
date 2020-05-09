@@ -2,9 +2,7 @@
 
 namespace SCode\AmqpExtraBundle\Serialization;
 
-use SCode\AmqpExtraBundle\Middleware\RoutingStrategyInterface;
-use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\Transport\AmqpExt\AmqpStamp;
+use SCode\AmqpExtraBundle\Routing\RoutingStrategyInterface;
 
 class HeadersConverter implements HeadersConverterInterface
 {

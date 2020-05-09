@@ -1,8 +1,6 @@
 <?php
 
-namespace SCode\AmqpExtraBundle\Middleware;
-
-use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
+namespace SCode\AmqpExtraBundle\Routing;
 
 class CashedRoutingStrategy implements RoutingStrategyInterface
 {

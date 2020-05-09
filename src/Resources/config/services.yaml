@@ -25,11 +25,11 @@ services:
         alias: amqp_extra.cached_routing_strategy
 
     amqp_extra.cached_routing_strategy:
-        class: SCode\AmqpExtraBundle\Middleware\CashedRoutingStrategy
+        class: SCode\AmqpExtraBundle\Routing\CashedRoutingStrategy
         arguments: ['@amqp_extra.simple_routing_strategy']
 
     amqp_extra.simple_routing_strategy:
-        class: SCode\AmqpExtraBundle\Middleware\SimpleRoutingStrategy
+        class: SCode\AmqpExtraBundle\Routing\SimpleRoutingStrategy
         arguments: ['@amqp_extra.routing_map_name_converter']
 
     amqp_extra.shared_transport_serializer:

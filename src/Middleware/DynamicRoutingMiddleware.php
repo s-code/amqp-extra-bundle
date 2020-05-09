@@ -2,6 +2,7 @@
 
 namespace SCode\AmqpExtraBundle\Middleware;
 
+use SCode\AmqpExtraBundle\Routing\RoutingStrategyInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\StackInterface;

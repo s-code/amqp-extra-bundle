@@ -15,11 +15,27 @@ services:
 
     amqp_extra.dynamic_routing_middleware:
         class: SCode\AmqpExtraBundle\Middleware\DynamicRoutingMiddleware
+        abstract: true
 
     amqp_extra.routing_map_name_converter:
         class: Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter
         arguments: [~, false]
 
-    amqp_extra.routing_map:
-        class: SCode\AmqpExtraBundle\Middleware\RoutingMap
-        arguments: ['@messenger_extra.routing_map_name_converter']
+    amqp_extra.default_routing_strategy:
+        alias: amqp_extra.cached_routing_strategy
+
+    amqp_extra.cached_routing_strategy:
+        class: SCode\AmqpExtraBundle\Middleware\CashedRoutingStrategy
+        arguments: ['@amqp_extra.simple_routing_strategy']
+
+    amqp_extra.simple_routing_strategy:
+        class: SCode\AmqpExtraBundle\Middleware\SimpleRoutingStrategy
+        arguments: ['@amqp_extra.routing_map_name_converter']
+
+    amqp_extra.shared_transport_serializer:
+        class: SCode\AmqpExtraBundle\Serialization\SharedTransportSerializer
+        abstract: true
+
+    amqp_extra.headers_converter:
+        class: SCode\AmqpExtraBundle\Serialization\HeadersConverter
+        abstract: true

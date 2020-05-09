@@ -19,23 +19,47 @@ class Configuration implements ConfigurationInterface
         }
 
         $rootNode
-            ->children()
-                ->arrayNode('routing')
-                    ->children()
-                        ->arrayNode('map')
-                            ->useAttributeAsKey('name')
-                            ->prototype('scalar')
+            ->useAttributeAsKey('name')
+            ->arrayPrototype()
+                ->children()
+                    ->arrayNode('dynamic_routing')
+                        ->canBeDisabled()
+                        ->children()
+                            ->arrayNode('class_map')
+                                ->scalarPrototype()->end()
+                            ->end()
+                            ->scalarNode('strategy')
+                                ->defaultValue('amqp_extra.default_routing_strategy')
+                                ->cannotBeEmpty()
+                                ->beforeNormalization()
+                                    ->ifTrue(function ($v) {
+                                        return strpos($v, '@') === 0;
+                                    })
+                                    ->then(function ($v) {
+                                        return substr($v, 1);
+                                    })
+                                ->end()
+                            ->end()
                         ->end()
-                        ->scalarNode('name_converter')
-                            ->defaultValue('amqp_extra.routing_map_name_converter')
-                            ->cannotBeEmpty()
-                            ->beforeNormalization()
-                            ->ifTrue(function ($v) {
-                                return strpos($v, '@') === 0;
-                            })
-                            ->then(function ($v) {
-                                return substr($v, 1);
-                            })
+                    ->end()
+                    ->arrayNode('shared_transport')
+                        ->canBeEnabled()
+                        ->children()
+                            ->scalarNode('original_serializer')
+                                ->defaultValue('messenger.transport.symfony_serializer')
+                                ->cannotBeEmpty()
+                                ->beforeNormalization()
+                                    ->ifTrue(function ($v) {
+                                        return strpos($v, '@') === 0;
+                                    })
+                                    ->then(function ($v) {
+                                        return substr($v, 1);
+                                    })
+                                ->end()
+                            ->end()
+                            ->arrayNode('headers_map')
+                                ->scalarPrototype()->end()
+                            ->end()
                         ->end()
                     ->end()
                 ->end()

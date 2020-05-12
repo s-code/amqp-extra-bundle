@@ -19,6 +19,18 @@ class Configuration implements ConfigurationInterface
         }
 
         $rootNode
+            ->validate()
+                ->ifTrue(function (array $config) {
+                    foreach ($config['shared_transport'] as $item) {
+                        if (!isset($config['routing'][$item['routing']])) {
+                            return true;
+                        }
+                    }
+
+                    return false;
+                })
+                ->thenInvalid('Shared transports configuration contain undefined roting names')
+            ->end()  
             ->children()
                 ->arrayNode('routing')
                     ->useAttributeAsKey('name')
@@ -46,14 +58,13 @@ class Configuration implements ConfigurationInterface
                     ->useAttributeAsKey('name')
                     ->arrayPrototype()
                         ->children()
-                            ->arrayNode('default_bus')
+                            ->scalarNode('default_bus')
                                 ->defaultValue('messenger.default_bus')
                                 ->cannotBeEmpty()
-                                ->scalarPrototype()->end()
                             ->end()
-                            ->arrayNode('routing')
+                            ->scalarNode('routing')
+                                ->isRequired()
                                 ->cannotBeEmpty()
-                                ->scalarPrototype()->end()
                             ->end()
                             ->scalarNode('original_serializer')
                                 ->defaultValue('messenger.transport.symfony_serializer')

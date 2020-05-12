@@ -20,60 +20,62 @@ class AmqpExtraExtension extends Extension
         $configuration = $this->getConfiguration($configs, $container);
         $config = $this->processConfiguration($configuration, $configs);
 
-        foreach ($config as $busName => $item) {
-            if ($item['dynamic_routing']['enabled']) {
-                $this->configureDymamicRoutingBus($busName, $item, $container);
-            }
+        if (!empty($config['routing'])) {
+            $this->configureRouting($config['routing'], $container);
+        }
 
-            if ($item['shared_transport']['enabled']) {
-                $this->configureSharedBus($busName, $item, $container);
-            }
+        if (!empty($config['shared_transport'])) {
+            $this->configureSharedTransport($config['shared_transport'], $container);
         }
     }
 
-    private function configureDymamicRoutingBus(string $busName, array $config, ContainerBuilder $container): void
+    private function configureRouting(array $configs, ContainerBuilder $container): void
     {
-        $middlewareName = $busName . '.dynamic_routing_middleware';
-        $routingContextParameter = $this->getRoutingContextParameter($busName);
+        foreach ($configs as $name => $config) {
+            $middlewareName = $name . '_routing_middleware';
+            $routingContextParameter = $this->getRoutingContextParameter($name);
 
-        $middleware = (new ChildDefinition('amqp_extra.dynamic_routing_middleware'))
-            ->setBindings([
-                '$strategy' => new Reference($config['dynamic_routing']['strategy']),
-                '$routingContext' => new Parameter($routingContextParameter)
-            ]);
+            $middleware = (new ChildDefinition('amqp_extra.dynamic_routing_middleware'))
+                ->setBindings([
+                    '$strategy' => new Reference($config['strategy']),
+                    '$routingContext' => new Parameter($routingContextParameter)
+                ]);
 
-        $container->setDefinition($middlewareName, $middleware);
-        $container->setParameter($routingContextParameter, ['class_map' => $config['dynamic_routing']['class_map']]);
+            $container->setDefinition($middlewareName, $middleware);
+            $container->setParameter($routingContextParameter, ['class_map' => $config['class_map']]);
+        }
     }
 
-    private function configureSharedBus(string $busName, array $config, ContainerBuilder $container): void
+    private function configureSharedTransport(array $configs, ContainerBuilder $container): void
     {
-        $serializerName = $busName . '.shared_serializer';
-        $headersConverterName = $busName . '.shared_headers_converter';
-        $headersMapParameter = $busName . '.shared_headers_map';
-        $routingContextParametr = $this->getRoutingContextParameter($busName);
+        foreach ($configs as $name => $config) {
+            $serializerName = $name . '_shared_transport_serializer';
+            $headersConverterName = $name . '_shared_transport_headers_converter';
+            $headersMapParameter = $name . '_shared_transport_headers_map';
+            $routingContextParameter = $this->getRoutingContextParameter($config['routing']);
 
-        $headersConverter = (new ChildDefinition('amqp_extra.headers_converter'))
-            ->setBindings([
-                '$routingStrategy' => new Reference($config['dynamic_routing']['strategy']),
-                '$routingContext' => new Parameter($routingContextParametr),
-                '$headersMap' => new Parameter($headersMapParameter),
-            ]);
+            $headersConverter = (new ChildDefinition('amqp_extra.headers_converter'))
+                ->setBindings([
+                    '$routingStrategy' => new Reference($config['dynamic_routing']['strategy']),
+                    '$routingContext' => new Parameter($routingContextParameter),
+                    '$headersMap' => new Parameter($headersMapParameter),
+                ]);
 
-        $serializer = (new ChildDefinition('amqp_extra.shared_transport_serializer'))
-            ->setBindings([
-                '$busName' => $busName,
-                '$originalSerializer' => new Reference($config['shared_transport']['original_serializer']),
-                '$headersConverter' => new Reference($headersConverterName)
-            ]);
+            $serializer = (new ChildDefinition('amqp_extra.shared_transport_serializer'))
+                ->setBindings([
+                    '$busName' => $config['default_bus'],
+                    '$originalSerializer' => new Reference($config['original_serializer']),
+                    '$headersConverter' => new Reference($headersConverterName)
+                ]);
 
-        $container->setDefinition($serializerName, $serializer);
-        $container->setDefinition($headersConverterName, $headersConverter);
-        $container->setParameter($headersMapParameter, $config['shared_transport']['headers_map']);
+            $container->setDefinition($serializerName, $serializer);
+            $container->setDefinition($headersConverterName, $headersConverter);
+            $container->setParameter($headersMapParameter, $config['headers_map']);
+        }
     }
     
-    private function getRoutingContextParameter(string $busName): string
+    private function getRoutingContextParameter(string $routingName): string
     {
-        return $busName . '.dynamic_routing_context';
+        return $routingName . '_routing_context';
     }
 }

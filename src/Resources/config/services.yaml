@@ -6,8 +6,7 @@ services:
     SCode\AmqpExtraBundle\Serialization\ArrayObjectDenormalizer: ~
 
     amqp_extra.rpc_transport_factory:
-        class: SCode\AmqpExtraBundle\Transport\RpcAmqpTransportFactory
-        arguments: ['@amqp_extra.rpc_transport_factory.inner']
+        class: SCode\AmqpExtraBundle\Transport\TransportFactory
         decorates: 'messenger.transport.amqp.factory'
 
     amqp_extra.rpc_middleware:

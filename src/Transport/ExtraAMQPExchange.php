@@ -2,11 +2,11 @@
 
 namespace SCode\AmqpExtraBundle\Transport;
 
-class AMQPExchange extends \AMQPExchange
+class ExtraAMQPExchange extends \AMQPExchange
 {
     public function declareExchange()
     {
-        if ($this->getName() === '') {
+        if (!$this->getName()) {
             return true;
         }
 

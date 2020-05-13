@@ -3,7 +3,6 @@
 namespace SCode\AmqpExtraBundle\Transport;
 
 use SCode\AmqpExtraBundle\Serialization\SharedTransportSerializerInterface;
-use Symfony\Component\Messenger\Transport\AmqpExt\AmqpTransport;
 use Symfony\Component\Messenger\Transport\AmqpExt\Connection;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
@@ -15,11 +14,11 @@ class TransportFactory implements TransportFactoryInterface
     {
         unset($options['transport_name']);
 
-        if ($serializer instanceof SharedTransportSerializerInterface) {
+        if (!isset($options['delay']['exchange_name'])) {
             $options['delay']['exchange_name'] = '';
         }
 
-        $connection = Connection::fromDsn($dsn, $options, new AmqpFactory());
+        $connection = Connection::fromDsn($dsn, $options, new AmqpFactory($options['delay']));
 
         if (empty($options['rpc'])) {
             return new AmqpTransport($connection, $serializer);

@@ -19,7 +19,7 @@ class AmqpSender extends SymfonyAmqpSender
     {
         $redeliveryStamp = $envelope->last(RedeliveryStamp::class);
 
-        if (!$redeliveryStamp instanceof AmqpReceivedStamp) {
+        if (!$redeliveryStamp instanceof RedeliveryStamp) {
             return $envelope;
         }
 

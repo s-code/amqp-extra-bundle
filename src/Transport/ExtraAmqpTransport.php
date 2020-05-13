@@ -11,11 +11,26 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\SetupableTransportInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 
-class AmqpTransport implements TransportInterface, SetupableTransportInterface, MessageCountAwareInterface
+class ExtraAmqpTransport implements TransportInterface, SetupableTransportInterface, MessageCountAwareInterface
 {
+    /**
+     * @var PhpSerializer|SerializerInterface
+     */
     private $serializer;
+
+    /**
+     * @var Connection
+     */
     private $connection;
+
+    /**
+     * @var AmqpReceiver
+     */
     private $receiver;
+
+    /**
+     * @var ExtraAmqpSender
+     */
     private $sender;
 
     public function __construct(Connection $connection, SerializerInterface $serializer = null)
@@ -77,8 +92,8 @@ class AmqpTransport implements TransportInterface, SetupableTransportInterface, 
         return $this->receiver = new AmqpReceiver($this->connection, $this->serializer);
     }
 
-    private function getSender(): AmqpSender
+    private function getSender(): ExtraAmqpSender
     {
-        return $this->sender = new AmqpSender($this->connection, $this->serializer);
+        return $this->sender = new ExtraAmqpSender($this->connection, $this->serializer);
     }
 }

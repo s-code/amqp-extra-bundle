@@ -8,7 +8,7 @@ use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
-class SharedTransportSerializer implements SerializerInterface, SharedTransportSerializerInterface
+class SharedTransportSerializer implements SerializerInterface
 {
     /**
      * @var Serializer

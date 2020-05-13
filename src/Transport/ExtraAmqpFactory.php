@@ -2,9 +2,9 @@
 
 namespace SCode\AmqpExtraBundle\Transport;
 
-use Symfony\Component\Messenger\Transport\AmqpExt\AmqpFactory as SymfonyAmqpFactory;
+use Symfony\Component\Messenger\Transport\AmqpExt\AmqpFactory;
 
-class AmqpFactory extends SymfonyAmqpFactory
+class ExtraAmqpFactory extends AmqpFactory
 {
     /**
      * @var array
@@ -19,7 +19,7 @@ class AmqpFactory extends SymfonyAmqpFactory
     public function createQueue(\AMQPChannel $channel): \AMQPQueue
     {
         if ($this->usedDefaultDelayExchange()) {
-            return new ExtraAMQPQueue($channel);
+            return new ExtraAmqpQueue($channel);
         }
 
         return parent::createQueue($channel);
@@ -28,7 +28,7 @@ class AmqpFactory extends SymfonyAmqpFactory
     public function createExchange(\AMQPChannel $channel): \AMQPExchange
     {
         if ($this->usedDefaultDelayExchange()) {
-            return new ExtraAMQPExchange($channel);
+            return new ExtraAmqpExchange($channel);
         }
 
         return parent::createExchange($channel);

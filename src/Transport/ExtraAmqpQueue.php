@@ -2,7 +2,7 @@
 
 namespace SCode\AmqpExtraBundle\Transport;
 
-class ExtraAMQPQueue extends \AMQPQueue
+class ExtraAmqpQueue extends \AMQPQueue
 {
     private const DEFAULT_EXCHANGE = '';
 

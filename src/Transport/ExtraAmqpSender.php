@@ -8,7 +8,7 @@ use Symfony\Component\Messenger\Transport\AmqpExt\AmqpReceivedStamp;
 use Symfony\Component\Messenger\Transport\AmqpExt\AmqpSender as SymfonyAmqpSender;
 use Symfony\Component\Messenger\Transport\AmqpExt\AmqpStamp;
 
-class AmqpSender extends SymfonyAmqpSender
+class ExtraAmqpSender extends SymfonyAmqpSender
 {
     public function send(Envelope $envelope): Envelope
     {

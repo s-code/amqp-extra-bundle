@@ -2,7 +2,7 @@
 
 namespace SCode\AmqpExtraBundle\Transport;
 
-class ExtraAMQPExchange extends \AMQPExchange
+class ExtraAmqpExchange extends \AMQPExchange
 {
     public function declareExchange()
     {

@@ -85,7 +85,7 @@ class RpcAmqpTransport implements TransportInterface, SetupableTransportInterfac
         $this->sender = new RpcAmqpSender(
             $this->connection,
             $this->serializer,
-            new AmqpSender($this->connection->getWrapped(), $this->serializer->getWrapped())
+            new ExtraAmqpSender($this->connection->getWrapped(), $this->serializer->getWrapped())
         );
 
         return $this->sender;
